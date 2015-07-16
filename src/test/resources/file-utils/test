@@ -1,0 +1,1 @@
+if this file is not present the new ClassPathResource("file-utils").getFile() will answer null
