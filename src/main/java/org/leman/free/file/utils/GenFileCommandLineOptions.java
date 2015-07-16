@@ -11,7 +11,7 @@ public class GenFileCommandLineOptions {
 
     @Option(name = "-zip", usage = "rename all files from a zip file", metaVar = "string", aliases = "--zipFile",
             required = false)
-    private boolean zipFile ;
+    private boolean zipFile;
 
     public String getFileName() {
         return fileName;

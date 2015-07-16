@@ -35,13 +35,6 @@ public class FileUtilsMain {
                 renameFiles.renameFile(file, file.getParent(), renameFiles.getNewFileName(file, renamingTypes));
             }
         }
-/*
-        for (int i = 0; i < files.length; i++) {
-            if (!files[i].isDirectory()) {
-                renameFiles.renameFile(files[i], files[i].getParent(), renameFiles.getNewFileName(files[i], renamingTypes));
-            }
-        }
-*/
     }
 
     private static GenFileCommandLineOptions getCommandLineArguments(String[] args) {

@@ -10,8 +10,8 @@ import org.leman.free.file.utils.RenamingType;
 
 public class RenameFiles {
     public static final String EXTENSION_SEPARATOR = ".";
-    public static final String REGEX_TO_FIND = "\\s";
-    public static final String CHAR_TO_REPLACE_WITH = "_";
+    public static final String REGEX_TO_FIND_SPACES = "\\s";
+    public static final String UNDERSCORE = "_";
     public static final String VOID_STRING = "";
 
     /**
@@ -21,16 +21,16 @@ public class RenameFiles {
      */
     public String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
         final String oldName = f.getName();
-        final String extension, name;
+        String extension = VOID_STRING;
+        String name = oldName;
         final Integer dotPos = oldName.lastIndexOf(EXTENSION_SEPARATOR);
 
-        if (dotPos <= 0) {
-            return checkTypeOfLettersCase(oldName, renamingTypes);
+        if (dotPos > 0) {
+            extension = oldName.substring(dotPos);
+            name = oldName.substring(0, dotPos);
         }
-        extension = oldName.substring(dotPos);
-        name = oldName.substring(0, dotPos);
 
-        final String[] nameSplit = name.split(REGEX_TO_FIND);
+        final String[] nameSplit = name.split(REGEX_TO_FIND_SPACES);
 
         StringBuffer newName = new StringBuffer(VOID_STRING);
 
@@ -39,7 +39,7 @@ public class RenameFiles {
                 if (!nameSplit[j].toString().equals(VOID_STRING)) {
                     newName = newName.append(nameSplit[j]);
                     if (j != nameSplit.length - 1) {
-                        newName = newName.append(CHAR_TO_REPLACE_WITH);
+                        newName = newName.append(UNDERSCORE);
                     }
                 }
             }
