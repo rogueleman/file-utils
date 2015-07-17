@@ -25,17 +25,24 @@ public class RenameFilesTest {
     public static final String SLASH_END = separator + "end";
     public static final String SLASH_START = separator + "start";
     public static final String USER_DIR = "user.dir";
+
     public static final String FILE_NOT_EXISTS = "test not exists.txt";
     public static final String FILE_NOT_EXISTS_WITH_UNDERSCORES = "test_not_exists.txt";
+
     public static final String FILE_NAME_WITH_SPACES = "test with spaces.txt";
-    public static final String FILE_NAME_WITH_SPACES_1 = "test with spaces 1.txt";
     public static final String FILE_NAME_WITH_UNDERSCORES = "test_with_spaces.txt";
+
+    public static final String FILE_NAME_WITH_SPACES_1 = "test with spaces 1.txt";
     public static final String FILE_NAME_WITH_SPACES_1_UPPERCASE = "TEST WITH SPACES 1.TXT";
+
     public static final String FILE_NAME_WITHOUT_EXTENSION = "test without extension";
     public static final String FILE_NAME_WITHOUT_EXTENSION_UPPERCASE = "TEST WITHOUT EXTENSION";
+
     public static final String FILE_NAME_WITHOUT_SPACES = "WithoutSpaces.txt";
+
     public static final String FILE_NAME_UPPERCASE = "UPPERCASE.txt";
     public static final String FILE_NAME_UPPERCASE_LOWERCASE = "uppercase.txt";
+
     public static final String FILE_NAME_TWO_CONVERSIONS = "test two conversions.txt";
     public static final String FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE = "TEST_TWO_CONVERSIONS.TXT";
 
@@ -197,4 +204,21 @@ public class RenameFilesTest {
         assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists(), true);
     }
 
+
+    @Test(expected = EnumConstantNotPresentException.class)
+    public void when_fileName_uppercase_without_spaces_wrong_renaming_type_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+        final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants("wrongRenamingType");
+
+        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITHOUT_SPACES);
+
+        //when
+        renameFiles.renameFile(fileToBeRenamed,
+                               fileToBeRenamed.getParent(),
+                               renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
+
+        //then
+
+    }
 }

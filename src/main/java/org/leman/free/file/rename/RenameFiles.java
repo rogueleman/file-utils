@@ -84,6 +84,9 @@ public class RenameFiles {
 
         final List<RenamingType> renamingTypes = new ArrayList<>();
 
+        //TODO: try for EnumConstantNotPresentException answer something useful for the user
+        // see test when_fileName_uppercase_without_spaces_wrong_renaming_type_ok
+
         if (renamingTypeSplit.length > 1) {
             for (final String type : renamingTypeSplit) {
                 renamingTypes.add(RenamingType.getByValue(type));
