@@ -37,4 +37,22 @@ public class GenFileCommandLineOptions {
     public String getSwap() {
         return swap;
     }
+
+    //for tests
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setRenamingType(String renamingType) {
+        this.renamingType = renamingType;
+    }
+
+    public void setSwap(String swap) {
+        this.swap = swap;
+    }
+
+    public void setZipFile(boolean zipFile) {
+        this.zipFile = zipFile;
+    }
 }

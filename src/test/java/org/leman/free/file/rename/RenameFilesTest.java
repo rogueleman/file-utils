@@ -3,7 +3,6 @@ package org.leman.free.file.rename;
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static junit.framework.Assert.assertEquals;
-import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.leman.free.file.utils.RenamingType.LOWERCASE_ALL;
 import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSCORES;
@@ -17,7 +16,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.leman.free.file.utils.GenFileCommandLineOptions;
 import org.leman.free.file.utils.RenamingType;
-import org.mockito.Mock;
 import org.springframework.core.io.ClassPathResource;
 
 public class RenameFilesTest {
@@ -46,13 +44,9 @@ public class RenameFilesTest {
     public static final String FILE_NAME_TWO_CONVERSIONS = "test two conversions.txt";
     public static final String FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE = "TEST_TWO_CONVERSIONS.TXT";
 
-    @Mock
-    final GenFileCommandLineOptions genFileCommandLineOptions;
-
     public static File currentDirectory;
 
     public RenameFilesTest() {
-        genFileCommandLineOptions = new GenFileCommandLineOptions();
     }
 
     @BeforeClass
@@ -71,7 +65,7 @@ public class RenameFilesTest {
     @AfterClass
     public static void afterClass() throws Exception {
         // delete all files from end directory
-        cleanDirectory(new File(currentDirectory + SLASH_END));
+       // cleanDirectory(new File(currentDirectory + SLASH_END));
     }
 
     @Test
@@ -196,9 +190,9 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists(), true);
+        assertEquals(new File(currentDirectory + SLASH_END,
+                              FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists(), true);
     }
-
 
     @Test(expected = EnumConstantNotPresentException.class)
     public void when_fileName_uppercase_without_spaces_wrong_renaming_type_ok() throws Exception {
@@ -213,7 +207,25 @@ public class RenameFilesTest {
                                fileToBeRenamed.getParent(),
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
-        //then
-
+        //then exception
     }
+
+    @Test
+    public void when_fileName_contains_dash_swap_sides() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        //problem with current directory !!!!!!!!!!!!!!!!!!!!!!!
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setSwap(" - ");
+        genFileCommandLineOptions.setFileName("titlu - autor.txt");
+
+        //when
+        renameFiles.swap(genFileCommandLineOptions);
+
+        //then
+        assertEquals(new File(currentDirectory + SLASH_END, "autor - titlu.txt").exists(), true);
+    }
+
 }

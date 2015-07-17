@@ -91,9 +91,8 @@ public class RenameFiles {
         return renamingTypes;
     }
 
-    public void renaming(final GenFileCommandLineOptions commandLineArguments,
-                         final String renamingType) {
-        final List<RenamingType> renamingTypes = getRenamingTypesConstants(renamingType);
+    public void renaming(final GenFileCommandLineOptions commandLineArguments) {
+        final List<RenamingType> renamingTypes = getRenamingTypesConstants(commandLineArguments.getRenamingType());
 
         final String fileName = commandLineArguments.getFileName();
         if (isNotBlank(fileName)) {
@@ -107,19 +106,35 @@ public class RenameFiles {
         }
     }
 
-    public void swap(final GenFileCommandLineOptions commandLineArguments, final String swap) {
+    public void swap(final GenFileCommandLineOptions commandLineArguments) {
+        final String swap = commandLineArguments.getSwap();
         final String fileName = commandLineArguments.getFileName();
+
         if (isNotBlank(fileName)) {
-            final String[] nameSplits = fileName.split(swap, 2);
+            final String[] nameSplits = getFileExtension(fileName)[0].split(swap, 2);
             final File file = new File(CURRENT_DIRECTORY + separator + fileName);
-            renameFile(file, file.getParent(), nameSplits, swap);
+            renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(fileName)[1]);
         } else {
             final File[] files = CURRENT_DIRECTORY.listFiles();
             for (final File file : files) {
-                final String[] nameSplits = file.getName().split(swap, 2);
-                renameFile(file, file.getParent(), nameSplits, swap);
+                final String[] nameSplits = getFileExtension(file.getName())[0].split(swap, 2);
+                renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(file.getName())[1]);
             }
         }
+    }
+
+    private String[] getFileExtension(String fileName) {
+        String extension = VOID_STRING;
+        String name = fileName;
+        final Integer dotPos = fileName.lastIndexOf(EXTENSION_SEPARATOR);
+
+        if (dotPos > 0) {
+            extension = fileName.substring(dotPos);
+            name = fileName.substring(0, dotPos);
+        }
+
+        final String[] returnValue = {name,  extension};
+        return returnValue;
     }
 
     /**
@@ -127,15 +142,18 @@ public class RenameFiles {
      * @param parent      - path to file to rename
      * @param nameSplits  - the splits Array
      */
-    private void renameFile(final File file, final String parent, final String[] nameSplits, final String swap) {
+    private void renameFile(final File file, final String parent, final String[] nameSplits, final String swap,
+                            final String extension) {
         if (nameSplits.length == 2) {
             if (!file.isDirectory() && !file.getName().equals("file-utils.jar")) {
                 StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
                 //TODO check the answer of renameTo
-                final boolean b = file.renameTo(new File(pathWithSlash + nameSplits[1] + swap + nameSplits[0]));
+                final String pathName = pathWithSlash + nameSplits[1] + swap + nameSplits[0] + extension;
+                final boolean b = file.renameTo(new File(pathName));
+                System.out.println("aaaaaa " + b);
             }
         } else {
-            System.out.println("File " + file + "does not contains the swap character");
+            System.out.println("File " + file.getName() + "does not contains the swap character");
         }
     }
 
