@@ -27,3 +27,8 @@ expected: file will be renamed to "Titlu-2---Nume-autor2.mobi"
 todo 99 - all above in a zip file -
 java -jar file-utils.jar --file abc test.zip -zip -rt underscore
 expected: all files from zip file will be renamed with _ in place of spaces
+
+
+Categories that can not be used together. If used the first one is used
+I lowercase, uppercase
+II underscore, space

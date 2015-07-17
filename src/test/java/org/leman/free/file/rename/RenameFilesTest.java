@@ -75,11 +75,6 @@ public class RenameFilesTest {
     }
 
     @Test
-    public void testGetNewFileName() throws Exception {
-        System.out.println(currentDirectory);
-    }
-
-    @Test
     public void when_fileName_with_spaces_to_be_renamed_with_underscores_ok() throws Exception {
         //given
         final RenameFiles renameFiles = new RenameFiles();

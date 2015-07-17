@@ -3,7 +3,6 @@ package org.leman.free.file.utils;
 public enum RenamingType {
     LOWERCASE_ALL("lower"),
     UPPERCASE_ALL("upper"),
-    SWITCH_POSITION_BETWEEN_FIRST_DASH("dash"),
     REPLACE_SPACES_WITH_UNDERSCORES("underscore"),
     REPLACE_UNDERSCORES_WITH_SPACES("space");
 

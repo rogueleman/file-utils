@@ -13,10 +13,10 @@ public class GenFileCommandLineOptions {
     private String renamingType;
 
     @Option(name = "-swap", usage = "swap position of the strings that that are on each side of first position of the" +
-                                    " character defined in renamingType", metaVar = "string",
+                                    " defined character", metaVar = "string",
             aliases = "--swap",
             required = false)
-    private boolean swap;
+    private String swap;
 
     @Option(name = "-zip", usage = "rename all files from a zip file", metaVar = "string", aliases = "--zipFile",
             required = false)
@@ -34,7 +34,7 @@ public class GenFileCommandLineOptions {
         return zipFile;
     }
 
-    public boolean isSwap() {
+    public String isSwap() {
         return swap;
     }
 }

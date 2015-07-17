@@ -1,5 +1,7 @@
 package org.leman.free.file.rename;
 
+import static java.io.File.separator;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.leman.free.file.utils.RenamingType.LOWERCASE_ALL;
 import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSCORES;
 import static org.leman.free.file.utils.RenamingType.UPPERCASE_ALL;
@@ -8,9 +10,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.leman.free.file.utils.GenFileCommandLineOptions;
 import org.leman.free.file.utils.RenamingType;
 
 public class RenameFiles {
+    // set start directory = current directory
+    private static File CURRENT_DIRECTORY = new File(System.getProperty("user.dir"));
+
     public static final String EXTENSION_SEPARATOR = ".";
     public static final String REGEX_TO_FIND_SPACES = "\\s";
     public static final String UNDERSCORE = "_";
@@ -21,7 +27,7 @@ public class RenameFiles {
      * @param renamingTypes - values for type of renaming
      * @return - the new name of the file
      */
-    public String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
+    protected String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
         final String oldName = f.getName();
         String extension = VOID_STRING;
         String name = oldName;
@@ -71,15 +77,16 @@ public class RenameFiles {
      * @param path     - path to file to rename
      * @param newFileName - the new name of the file
      */
-    public void renameFile(final File f, final String path, final String newFileName) {
+    protected void renameFile(final File f, final String path, final String newFileName) {
         if (!f.isDirectory() && !f.getName().equals("file-utils.jar")) {
             StringBuffer pathWithSlash = new StringBuffer(path);
-            pathWithSlash = pathWithSlash.insert(path.length(), File.separator);
-            f.renameTo(new File(pathWithSlash + newFileName));
+            pathWithSlash = pathWithSlash.insert(path.length(), separator);
+            //TODO check the answer of renameTo
+            final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
         }
     }
 
-    public List<RenamingType> getRenamingTypesConstants(final String renamingType) {
+    protected List<RenamingType> getRenamingTypesConstants(final String renamingType) {
         final String[] renamingTypeSplit = renamingType.split(REGEX_TO_FIND_SPACES);
 
         final List<RenamingType> renamingTypes = new ArrayList<>();
@@ -96,5 +103,21 @@ public class RenameFiles {
         }
 
         return renamingTypes;
+    }
+
+    public void renaming(final GenFileCommandLineOptions commandLineArguments,
+                         final String renamingType) {
+        final List<RenamingType> renamingTypes = getRenamingTypesConstants(renamingType);
+
+        final String fileName = commandLineArguments.getFileName();
+        if (isNotBlank(fileName)) {
+            final File file = new File(CURRENT_DIRECTORY + separator + fileName);
+            renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
+        } else {
+            final File[] files = CURRENT_DIRECTORY.listFiles();
+            for (File file : files) {
+                renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
+            }
+        }
     }
 }
