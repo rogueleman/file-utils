@@ -1,5 +1,7 @@
 package org.leman.free.file.main;
 
+import static java.io.File.separator;
+
 import java.io.File;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class FileUtilsMain {
 
         final String fileName = commandLineArguments.getFileName();
         if (StringUtils.isNotBlank(fileName)) {
-            final File file = new File(CURRENT_DIRECTORY + File.pathSeparator + fileName);
+            final File file = new File(CURRENT_DIRECTORY + separator + fileName);
             renameFiles.renameFile(file, file.getParent(), renameFiles.getNewFileName(file, renamingTypes));
         } else {
             final File[] files = CURRENT_DIRECTORY.listFiles();
