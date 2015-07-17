@@ -9,16 +9,16 @@ public class GenFileCommandLineOptions {
 
     @Option(name = "-rt", usage = "renaming type: lower, upper, dash, underscore, space", metaVar = "string",
             aliases = "--renamingType",
-            required = true)
+            required = false)
     private String renamingType;
 
-    @Option(name = "-swap", usage = "swap position of the strings that that are on each side of first position of the" +
+    @Option(name = "-s", usage = "swap position of the strings that that are on each side of first position of the" +
                                     " defined character", metaVar = "string",
             aliases = "--swap",
             required = false)
     private String swap;
 
-    @Option(name = "-zip", usage = "rename all files from a zip file", metaVar = "string", aliases = "--zipFile",
+    @Option(name = "-z", usage = "rename all files from a zip file", metaVar = "string", aliases = "--zipFile",
             required = false)
     private boolean zipFile;
 
@@ -34,7 +34,7 @@ public class GenFileCommandLineOptions {
         return zipFile;
     }
 
-    public String isSwap() {
+    public String getSwap() {
         return swap;
     }
 }

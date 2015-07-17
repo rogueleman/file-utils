@@ -1,5 +1,6 @@
 package org.leman.free.file.main;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.leman.free.file.rename.RenameFiles;
@@ -13,7 +14,13 @@ public class FileUtilsMain {
     public static void main(String[] args) {
         final GenFileCommandLineOptions commandLineArguments = getCommandLineArguments(args);
         final RenameFiles renameFiles = new RenameFiles();
-        renameFiles.renaming(commandLineArguments, commandLineArguments.getRenamingType());
+        if (StringUtils.isNotBlank(commandLineArguments.getRenamingType())) {
+            renameFiles.renaming(commandLineArguments, commandLineArguments.getRenamingType());
+        }
+
+        if (StringUtils.isNotBlank(commandLineArguments.getSwap())) {
+            renameFiles.swap(commandLineArguments, commandLineArguments.getSwap());
+        }
     }
 
     private static GenFileCommandLineOptions getCommandLineArguments(String[] args) {

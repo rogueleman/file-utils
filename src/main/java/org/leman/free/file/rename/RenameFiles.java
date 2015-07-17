@@ -72,20 +72,6 @@ public class RenameFiles {
         }
     }
 
-    /**
-     * @param f        - file to rename
-     * @param path     - path to file to rename
-     * @param newFileName - the new name of the file
-     */
-    protected void renameFile(final File f, final String path, final String newFileName) {
-        if (!f.isDirectory() && !f.getName().equals("file-utils.jar")) {
-            StringBuffer pathWithSlash = new StringBuffer(path);
-            pathWithSlash = pathWithSlash.insert(path.length(), separator);
-            //TODO check the answer of renameTo
-            final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
-        }
-    }
-
     protected List<RenamingType> getRenamingTypesConstants(final String renamingType) {
         final String[] renamingTypeSplit = renamingType.split(REGEX_TO_FIND_SPACES);
 
@@ -115,9 +101,54 @@ public class RenameFiles {
             renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
         } else {
             final File[] files = CURRENT_DIRECTORY.listFiles();
-            for (File file : files) {
+            for (final File file : files) {
                 renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
             }
+        }
+    }
+
+    public void swap(final GenFileCommandLineOptions commandLineArguments, final String swap) {
+        final String fileName = commandLineArguments.getFileName();
+        if (isNotBlank(fileName)) {
+            final String[] nameSplits = fileName.split(swap, 2);
+            final File file = new File(CURRENT_DIRECTORY + separator + fileName);
+            renameFile(file, file.getParent(), nameSplits, swap);
+        } else {
+            final File[] files = CURRENT_DIRECTORY.listFiles();
+            for (final File file : files) {
+                final String[] nameSplits = file.getName().split(swap, 2);
+                renameFile(file, file.getParent(), nameSplits, swap);
+            }
+        }
+    }
+
+    /**
+     * @param file        - file to rename
+     * @param parent      - path to file to rename
+     * @param nameSplits  - the splits Array
+     */
+    private void renameFile(final File file, final String parent, final String[] nameSplits, final String swap) {
+        if (nameSplits.length == 2) {
+            if (!file.isDirectory() && !file.getName().equals("file-utils.jar")) {
+                StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
+                //TODO check the answer of renameTo
+                final boolean b = file.renameTo(new File(pathWithSlash + nameSplits[1] + swap + nameSplits[0]));
+            }
+        } else {
+            System.out.println("File " + file + "does not contains the swap character");
+        }
+    }
+
+    /**
+     * @param f           - file to rename
+     * @param parent      - path to file to rename
+     * @param newFileName - the new name of the file
+     */
+    protected void renameFile(final File f, final String parent, final String newFileName) {
+        if (!f.isDirectory() && !f.getName().equals("file-utils.jar")) {
+            StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
+            //TODO check the answer of renameTo
+            final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
         }
     }
 }
