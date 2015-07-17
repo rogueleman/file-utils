@@ -25,7 +25,7 @@ public class FileUtilsMain {
 
         final RenameFiles renameFiles = new RenameFiles();
 
-        final List<RenamingType> renamingTypes = RenamingType.getRenamingTypesConstants(renamingType);
+        final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(renamingType);
 
         final String fileName = commandLineArguments.getFileName();
         if (StringUtils.isNotBlank(fileName)) {

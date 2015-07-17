@@ -5,6 +5,7 @@ import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSC
 import static org.leman.free.file.utils.RenamingType.UPPERCASE_ALL;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.leman.free.file.utils.RenamingType;
@@ -76,5 +77,21 @@ public class RenameFiles {
             pathWithSlash = pathWithSlash.insert(path.length(), File.separator);
             f.renameTo(new File(pathWithSlash + newFileName));
         }
+    }
+
+    public List<RenamingType> getRenamingTypesConstants(final String renamingType) {
+        final String[] renamingTypeSplit = renamingType.split(REGEX_TO_FIND_SPACES);
+
+        final List<RenamingType> renamingTypes = new ArrayList<>();
+
+        if (renamingTypeSplit.length > 1) {
+            for (final String type : renamingTypeSplit) {
+                renamingTypes.add(RenamingType.getByValue(type));
+            }
+        } else {
+            renamingTypes.add(RenamingType.getByValue(renamingType));
+        }
+
+        return renamingTypes;
     }
 }

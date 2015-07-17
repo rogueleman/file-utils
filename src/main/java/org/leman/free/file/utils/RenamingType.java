@@ -1,8 +1,5 @@
 package org.leman.free.file.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum RenamingType {
     LOWERCASE_ALL("lower"),
     UPPERCASE_ALL("upper"),
@@ -12,11 +9,11 @@ public enum RenamingType {
 
     private final String value;
 
-    private RenamingType(String value) {
+    private RenamingType(final String value) {
         this.value = value;
     }
 
-    public static RenamingType getByValue(String userAttribute) {
+    public static RenamingType getByValue(final String userAttribute) {
         for (RenamingType t : RenamingType.values())
             if (t.getValue().equalsIgnoreCase(userAttribute))
                 return t;
@@ -27,11 +24,7 @@ public enum RenamingType {
         return value;
     }
 
-    public static List<RenamingType> getRenamingTypesConstants(String renamingType) {
-        final List<RenamingType> renamingTypes = new ArrayList<>();
-        renamingTypes.add(RenamingType.getByValue(renamingType));
-        return renamingTypes;
-    }
+
 
 
 }
