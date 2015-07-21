@@ -2,12 +2,17 @@ package org.leman.free.file.main;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
+import java.io.File;
+
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.leman.free.file.rename.RenameFiles;
 import org.leman.free.file.utils.GenFileCommandLineOptions;
 
 public class FileUtilsMain {
+
+    // set start directory = current directory
+    private static File CURRENT_DIRECTORY = new File(System.getProperty("user.dir"));
 
     /**
      * @param args
@@ -16,11 +21,11 @@ public class FileUtilsMain {
         final GenFileCommandLineOptions commandLineArguments = getCommandLineArguments(args);
         final RenameFiles renameFiles = new RenameFiles();
         if (isNotBlank(commandLineArguments.getRenamingType())) {
-            renameFiles.renaming(commandLineArguments);
+            renameFiles.renaming(CURRENT_DIRECTORY, commandLineArguments);
         }
 
         if (isNotBlank(commandLineArguments.getSwap())) {
-            renameFiles.swap(commandLineArguments);
+            renameFiles.swap(CURRENT_DIRECTORY, commandLineArguments);
         }
     }
 

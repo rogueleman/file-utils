@@ -14,9 +14,6 @@ import org.leman.free.file.utils.GenFileCommandLineOptions;
 import org.leman.free.file.utils.RenamingType;
 
 public class RenameFiles {
-    // set start directory = current directory
-    private static File CURRENT_DIRECTORY = new File(System.getProperty("user.dir"));
-
     public static final String EXTENSION_SEPARATOR = ".";
     public static final String REGEX_TO_FIND_SPACES = "\\s";
     public static final String UNDERSCORE = "_";
@@ -91,31 +88,31 @@ public class RenameFiles {
         return renamingTypes;
     }
 
-    public void renaming(final GenFileCommandLineOptions commandLineArguments) {
+    public void renaming(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
         final List<RenamingType> renamingTypes = getRenamingTypesConstants(commandLineArguments.getRenamingType());
 
         final String fileName = commandLineArguments.getFileName();
         if (isNotBlank(fileName)) {
-            final File file = new File(CURRENT_DIRECTORY + separator + fileName);
+            final File file = new File(currentDirectory + separator + fileName);
             renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
         } else {
-            final File[] files = CURRENT_DIRECTORY.listFiles();
+            final File[] files = currentDirectory.listFiles();
             for (final File file : files) {
                 renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
             }
         }
     }
 
-    public void swap(final GenFileCommandLineOptions commandLineArguments) {
+    public void swap(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
         final String swap = commandLineArguments.getSwap();
         final String fileName = commandLineArguments.getFileName();
 
         if (isNotBlank(fileName)) {
             final String[] nameSplits = getFileExtension(fileName)[0].split(swap, 2);
-            final File file = new File(CURRENT_DIRECTORY + separator + fileName);
+            final File file = new File(currentDirectory + separator + fileName);
             renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(fileName)[1]);
         } else {
-            final File[] files = CURRENT_DIRECTORY.listFiles();
+            final File[] files = currentDirectory.listFiles();
             for (final File file : files) {
                 final String[] nameSplits = getFileExtension(file.getName())[0].split(swap, 2);
                 renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(file.getName())[1]);

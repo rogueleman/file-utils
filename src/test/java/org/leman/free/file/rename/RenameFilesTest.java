@@ -3,6 +3,7 @@ package org.leman.free.file.rename;
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static junit.framework.Assert.assertEquals;
+import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.leman.free.file.utils.RenamingType.LOWERCASE_ALL;
 import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSCORES;
@@ -60,12 +61,14 @@ public class RenameFilesTest {
         final File source = new File(currentDirectory + SLASH_START);
         final File destination = new File(currentDirectory + SLASH_END);
         copyDirectory(source, destination);
+
+        currentDirectory = destination;
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
         // delete all files from end directory
-       // cleanDirectory(new File(currentDirectory + SLASH_END));
+       cleanDirectory(new File(currentDirectory.getPath()));
     }
 
     @Test
@@ -75,7 +78,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITH_SPACES);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITH_SPACES);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -83,7 +86,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_WITH_UNDERSCORES).exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_WITH_UNDERSCORES).exists(), true);
     }
 
     @Test
@@ -93,7 +96,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NOT_EXISTS);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NOT_EXISTS);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -101,7 +104,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NOT_EXISTS_WITH_UNDERSCORES).exists(), false);
+        assertEquals(new File(currentDirectory, FILE_NOT_EXISTS_WITH_UNDERSCORES).exists(), false);
     }
 
     @Test
@@ -110,7 +113,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(UPPERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITH_SPACES_1);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITH_SPACES_1);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -118,7 +121,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists(), true);
     }
 
     @Test
@@ -127,7 +130,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(UPPERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITHOUT_EXTENSION);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITHOUT_EXTENSION);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -135,7 +138,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists(), true);
     }
 
     @Test
@@ -145,7 +148,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITHOUT_SPACES);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITHOUT_SPACES);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -153,7 +156,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_WITHOUT_SPACES).exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_WITHOUT_SPACES).exists(), true);
     }
 
     @Test
@@ -162,7 +165,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(LOWERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_UPPERCASE);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_UPPERCASE);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -170,7 +173,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, FILE_NAME_UPPERCASE_LOWERCASE).exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_UPPERCASE_LOWERCASE).exists(), true);
     }
 
     @Test
@@ -182,7 +185,7 @@ public class RenameFilesTest {
                                                                                        + REPLACE_SPACES_WITH_UNDERSCORES
                 .getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_TWO_CONVERSIONS);
+        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_TWO_CONVERSIONS);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -190,7 +193,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END,
+        assertEquals(new File(currentDirectory,
                               FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists(), true);
     }
 
@@ -215,17 +218,15 @@ public class RenameFilesTest {
         //given
         final RenameFiles renameFiles = new RenameFiles();
 
-        //problem with current directory !!!!!!!!!!!!!!!!!!!!!!!
-
         final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
         genFileCommandLineOptions.setSwap(" - ");
         genFileCommandLineOptions.setFileName("titlu - autor.txt");
 
         //when
-        renameFiles.swap(genFileCommandLineOptions);
+        renameFiles.swap(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(currentDirectory + SLASH_END, "autor - titlu.txt").exists(), true);
+        assertEquals(new File(currentDirectory, "autor - titlu.txt").exists(), true);
     }
 
 }
