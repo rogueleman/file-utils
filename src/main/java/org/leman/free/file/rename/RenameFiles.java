@@ -150,7 +150,7 @@ public class RenameFiles {
                 System.out.println("aaaaaa " + b);
             }
         } else {
-            System.out.println("File " + file.getName() + "does not contains the swap character");
+            System.out.println("File \"" + file.getName() + "\" does not contains the swap character");
         }
     }
 
@@ -164,6 +164,7 @@ public class RenameFiles {
             StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
             //TODO check the answer of renameTo
             final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
+            System.out.println("bbbbbb " + b);
         }
     }
 }

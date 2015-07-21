@@ -21,9 +21,12 @@ import org.springframework.core.io.ClassPathResource;
 
 public class RenameFilesTest {
 
+    public static final String USER_DIR = "user.dir";
+
     public static final String SLASH_END = separator + "end";
     public static final String SLASH_START = separator + "start";
-    public static final String USER_DIR = "user.dir";
+    public static final String SLASH_DASH = separator + "dash";
+    public static final String SLASH_SPACE = separator + "space";
 
     public static final String FILE_NOT_EXISTS = "test not exists.txt";
     public static final String FILE_NOT_EXISTS_WITH_UNDERSCORES = "test_not_exists.txt";
@@ -44,6 +47,16 @@ public class RenameFilesTest {
 
     public static final String FILE_NAME_TWO_CONVERSIONS = "test two conversions.txt";
     public static final String FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE = "TEST_TWO_CONVERSIONS.TXT";
+
+    public static final String FILE_NAME_TITLU_DASH_AUTOR = "titlu - autor.txt";
+    public static final String FILE_NAME_AUTOR_DASH_TITLU = "autor - titlu.txt";
+    public static final String FILE_NAME_TITLU_AUTOR = "titlu autor.txt";
+
+    public static final String FILE_NAME_AUTOR1_DASH_TITLU1 = "autor1 - titlu1.txt";
+    public static final String FILE_NAME_AUTOR2_DASH_TITLU2 = "autor2 - titlu2.txt";
+
+    public static final String FILE_NAME_TEST_UNDERSCORE = "test_underscore.txt";
+    public static final String FILE_NAME_TEST_UNDERSCORE_UPPERCASE = "TEST_UNDERSCORE.TXT";
 
     public static File currentDirectory;
 
@@ -220,13 +233,80 @@ public class RenameFilesTest {
 
         final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
         genFileCommandLineOptions.setSwap(" - ");
-        genFileCommandLineOptions.setFileName("titlu - autor.txt");
+        genFileCommandLineOptions.setFileName(FILE_NAME_TITLU_DASH_AUTOR);
 
         //when
         renameFiles.swap(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(currentDirectory, "autor - titlu.txt").exists(), true);
+        assertEquals(new File(currentDirectory, FILE_NAME_AUTOR_DASH_TITLU).exists(), true);
+    }
+
+    @Test
+    public void when_fileName_not_contains_dash_swap_sides() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setSwap(" - ");
+        genFileCommandLineOptions.setFileName(FILE_NAME_TITLU_AUTOR);
+
+        //when
+        renameFiles.swap(currentDirectory, genFileCommandLineOptions);
+
+        //then
+        assertEquals(new File(currentDirectory, FILE_NAME_TITLU_AUTOR).exists(), true);
+    }
+
+    @Test
+    public void when_fileName_contains_dash_in_given_folder_swap_sides() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setSwap(" - ");
+
+        final File workDirectory = new File(currentDirectory + SLASH_DASH);
+        //when
+        renameFiles.swap(workDirectory, genFileCommandLineOptions);
+
+        //then
+        assertEquals(new File(workDirectory, FILE_NAME_AUTOR1_DASH_TITLU1).exists(), true);
+        assertEquals(new File(workDirectory, FILE_NAME_AUTOR2_DASH_TITLU2).exists(), true);
+    }
+
+    @Test
+    public void when_fileName_in_folder_with_spaces_to_be_renamed_uppercase_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setRenamingType(UPPERCASE_ALL.getValue());
+
+        final File workDirectory = new File(currentDirectory + SLASH_SPACE);
+
+        //when
+        renameFiles.renaming(workDirectory, genFileCommandLineOptions);
+
+        //then
+        assertEquals(new File(workDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists(), true);
+        assertEquals(new File(workDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists(), true);
+    }
+
+    @Test
+    public void when_fileName_contains_underscore_rename_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setRenamingType(UPPERCASE_ALL.getValue());
+        genFileCommandLineOptions.setFileName(FILE_NAME_TEST_UNDERSCORE);
+
+        //when
+        renameFiles.renaming(currentDirectory, genFileCommandLineOptions);
+
+        //then
+        assertEquals(new File(currentDirectory, FILE_NAME_TEST_UNDERSCORE_UPPERCASE).exists(), true);
     }
 
 }
