@@ -2,23 +2,27 @@ package org.leman.free.file.rename;
 
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
-import static junit.framework.Assert.assertEquals;
 import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.leman.free.file.utils.RenamingType.LOWERCASE_ALL;
 import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSCORES;
 import static org.leman.free.file.utils.RenamingType.UPPERCASE_ALL;
 
 import java.io.File;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.leman.free.file.utils.GenFileCommandLineOptions;
 import org.leman.free.file.utils.RenamingType;
-import org.springframework.core.io.ClassPathResource;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RenameFilesTest {
 
     public static final String USER_DIR = "user.dir";
@@ -65,7 +69,11 @@ public class RenameFilesTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        final File file = new ClassPathResource("file-utils").getFile();
+        //get the folder resource by other method, not using Spring method ClassPathResource
+        URL resource = RenameFilesTest.class.getResource("/file-utils");
+        final File file = Paths.get(resource.toURI()).toFile();
+
+        //final File file = new ClassPathResource("file-utils").getFile();
         System.setProperty(USER_DIR, file.getPath());
 
         currentDirectory = new File(getProperty(USER_DIR));
@@ -81,7 +89,7 @@ public class RenameFilesTest {
     @AfterClass
     public static void afterClass() throws Exception {
         // delete all files from end directory
-       cleanDirectory(new File(currentDirectory.getPath()));
+        cleanDirectory(new File(currentDirectory.getPath()));
     }
 
     @Test
@@ -99,7 +107,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_WITH_UNDERSCORES).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_WITH_UNDERSCORES).exists()).isTrue();
     }
 
     @Test
@@ -117,7 +125,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NOT_EXISTS_WITH_UNDERSCORES).exists(), false);
+        assertThat(new File(currentDirectory, FILE_NOT_EXISTS_WITH_UNDERSCORES).exists()).isFalse();
     }
 
     @Test
@@ -134,7 +142,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists()).isTrue();
     }
 
     @Test
@@ -151,7 +159,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists()).isTrue();
     }
 
     @Test
@@ -169,7 +177,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_WITHOUT_SPACES).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_WITHOUT_SPACES).exists()).isTrue();
     }
 
     @Test
@@ -186,7 +194,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_UPPERCASE_LOWERCASE).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_UPPERCASE_LOWERCASE).exists()).isTrue();
     }
 
     @Test
@@ -206,8 +214,7 @@ public class RenameFilesTest {
                                renameFiles.getNewFileName(fileToBeRenamed, renamingTypes));
 
         //then
-        assertEquals(new File(currentDirectory,
-                              FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_TWO_CONVERSIONS_UPPERCASE_AND_UNDERSCORE).exists()).isTrue();
     }
 
     @Test(expected = EnumConstantNotPresentException.class)
@@ -239,7 +246,7 @@ public class RenameFilesTest {
         renameFiles.swap(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_AUTOR_DASH_TITLU).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_AUTOR_DASH_TITLU).exists()).isTrue();
     }
 
     @Test
@@ -255,7 +262,7 @@ public class RenameFilesTest {
         renameFiles.swap(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_TITLU_AUTOR).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_TITLU_AUTOR).exists()).isTrue();
     }
 
     @Test
@@ -271,8 +278,8 @@ public class RenameFilesTest {
         renameFiles.swap(workDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(workDirectory, FILE_NAME_AUTOR1_DASH_TITLU1).exists(), true);
-        assertEquals(new File(workDirectory, FILE_NAME_AUTOR2_DASH_TITLU2).exists(), true);
+        assertThat(new File(workDirectory, FILE_NAME_AUTOR1_DASH_TITLU1).exists()).isTrue();
+        assertThat(new File(workDirectory, FILE_NAME_AUTOR2_DASH_TITLU2).exists()).isTrue();
     }
 
     @Test
@@ -289,8 +296,8 @@ public class RenameFilesTest {
         renameFiles.renaming(workDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(workDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists(), true);
-        assertEquals(new File(workDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists(), true);
+        assertThat(new File(workDirectory, FILE_NAME_WITH_SPACES_1_UPPERCASE).exists()).isTrue();
+        assertThat(new File(workDirectory, FILE_NAME_WITHOUT_EXTENSION_UPPERCASE).exists()).isTrue();
     }
 
     @Test
@@ -306,7 +313,7 @@ public class RenameFilesTest {
         renameFiles.renaming(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertEquals(new File(currentDirectory, FILE_NAME_TEST_UNDERSCORE_UPPERCASE).exists(), true);
+        assertThat(new File(currentDirectory, FILE_NAME_TEST_UNDERSCORE_UPPERCASE).exists()).isTrue();
     }
 
 }
