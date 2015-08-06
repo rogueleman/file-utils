@@ -14,7 +14,7 @@ combine multiple renaming types
 java -jar file-utils.jar -f "a b c.txt" -rt "underscore upper"
 expected: file will be renamed to A_B_C.txt
 
-todo 3
+#3 - done
 swap filename for a given string, here " - " is default
 java -jar file-utils.jar -f "Titlu 2 - Nume autor2.mobi" -swap
 expected: file will be renamed to Nume autor2 - Titlu 2.mobi
@@ -30,5 +30,6 @@ expected: all files from zip file will be renamed with _ in place of spaces
 
 
 Categories that can not be used together. If used the first one is used
-I lowercase, uppercase
-II underscore, space
+I    lowercase, uppercase
+II   underscore, space
+III  swap with any other
