@@ -21,7 +21,7 @@ expected: file will be renamed to Nume autor2 - Titlu 2.mobi
 
 todo 4 -
 user will choose the characters
-java -jar file-utils.jar -f "Titlu 2 - Nume autor2.mobi" -swap --searchString " " --replaceWith "-"
+java -jar file-utils.jar -f "Titlu 2 - Nume autor2.mobi" -swap --findString " " --replaceString "-"
 expected: file will be renamed to "Titlu-2---Nume-autor2.mobi"
 
 todo 99 - all above in a zip file -

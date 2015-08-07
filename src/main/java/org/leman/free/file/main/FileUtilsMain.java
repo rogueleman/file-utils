@@ -1,5 +1,6 @@
 package org.leman.free.file.main;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
@@ -20,12 +21,29 @@ public class FileUtilsMain {
     public static void main(String[] args) {
         final GenFileCommandLineOptions commandLineArguments = getCommandLineArguments(args);
         final RenameFiles renameFiles = new RenameFiles();
-        if (isNotBlank(commandLineArguments.getRenamingType())) {
-            renameFiles.renaming(CURRENT_DIRECTORY, commandLineArguments);
+
+        final Boolean renameAndSwapFilled = isNotBlank(commandLineArguments.getRenamingType())
+                                  && isNotBlank(commandLineArguments.getSwap());
+
+        final Boolean findAndReplaceNotFilled = (isNotBlank(commandLineArguments.getFindString())
+                                           && isBlank(commandLineArguments.getReplaceString()))
+                                           || (isBlank(commandLineArguments.getFindString())
+                                           && isNotBlank(commandLineArguments.getReplaceString()));
+
+        if (renameAndSwapFilled || findAndReplaceNotFilled) {
+            System.err.println("Please use the arguments properly: renamingType "
+                               + "OR swap "
+                               + "OR findString AND replaceString!!!");
         }
 
-        if (isNotBlank(commandLineArguments.getSwap())) {
+        if (isNotBlank(commandLineArguments.getFindString()) && isNotBlank(commandLineArguments.getReplaceString())) {
+            renameFiles.renaming(CURRENT_DIRECTORY, commandLineArguments);
+        } else if (isNotBlank(commandLineArguments.getRenamingType())) {
+                renameFiles.renaming(CURRENT_DIRECTORY, commandLineArguments);
+        } else if (isNotBlank(commandLineArguments.getSwap())) {
             renameFiles.swap(CURRENT_DIRECTORY, commandLineArguments);
+        } else {
+            System.err.println("your command does not contains the right arguments!!!");
         }
     }
 

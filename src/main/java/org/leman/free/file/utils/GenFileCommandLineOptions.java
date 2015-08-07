@@ -18,6 +18,17 @@ public class GenFileCommandLineOptions {
             required = false)
     private String swap;
 
+    @Option(name = "-fs", usage = "string defined by the user to be searched in the file name", metaVar = "string",
+            aliases = "--findString",
+            required = false)
+    private String findString;
+
+    @Option(name = "-rs", usage = "swap position of the strings that that are on each side of first position of the" +
+                                 " defined character", metaVar = "string",
+            aliases = "--replaceString",
+            required = false)
+    private String replaceString;
+
     @Option(name = "-z", usage = "rename all files from a zip file", metaVar = "string", aliases = "--zipFile",
             required = false)
     private boolean zipFile;
@@ -36,6 +47,14 @@ public class GenFileCommandLineOptions {
 
     public String getSwap() {
         return swap;
+    }
+
+    public String getFindString() {
+        return findString;
+    }
+
+    public String getReplaceString() {
+        return replaceString;
     }
 
     //for tests

@@ -25,17 +25,11 @@ public class RenameFiles {
      * @return - the new name of the file
      */
     protected String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
-        final String oldName = f.getName();
-        String extension = VOID_STRING;
-        String name = oldName;
-        final Integer dotPos = oldName.lastIndexOf(EXTENSION_SEPARATOR);
+        FileInfos fileInfos = new FileInfos(f).invoke();
+        String name = fileInfos.getName();
+        String extension = fileInfos.getExtension();
 
         StringBuffer newName = new StringBuffer(name);
-
-        if (dotPos > 0) {
-            extension = oldName.substring(dotPos);
-            name = oldName.substring(0, dotPos);
-        }
 
         if (renamingTypes.contains(REPLACE_SPACES_WITH_UNDERSCORES)) {
             final String[] nameSplit = name.split(REGEX_TO_FIND_SPACES);
@@ -55,6 +49,8 @@ public class RenameFiles {
             } else {
                 newName = newName.append(name).append(extension);
             }
+        } else {
+            newName = newName.append(extension);
         }
         return checkTypeOfLettersCase(newName.toString(), renamingTypes);
     }
@@ -89,18 +85,33 @@ public class RenameFiles {
     }
 
     public void renaming(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
-        final List<RenamingType> renamingTypes = getRenamingTypesConstants(commandLineArguments.getRenamingType());
 
-        final String fileName = commandLineArguments.getFileName();
-        if (isNotBlank(fileName)) {
-            final File file = new File(currentDirectory + separator + fileName);
-            renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
-        } else {
-            final File[] files = currentDirectory.listFiles();
-            for (final File file : files) {
+        if (isNotBlank(commandLineArguments.getRenamingType())) {
+            final List<RenamingType> renamingTypes = getRenamingTypesConstants(commandLineArguments.getRenamingType());
+
+            final String fileName = commandLineArguments.getFileName();
+            if (isNotBlank(fileName)) {
+                final File file = new File(currentDirectory + separator + fileName);
                 renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
+            } else {
+                final File[] files = currentDirectory.listFiles();
+                for (final File file : files) {
+                    renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
+                }
+            }
+        } else {
+            final String fileName = commandLineArguments.getFileName();
+            if (isNotBlank(fileName)) {
+                final File file = new File(currentDirectory + separator + fileName);
+                //TODO
+            } else {
+                final File[] files = currentDirectory.listFiles();
+                for (final File file : files) {
+                    //TODO
+                }
             }
         }
+
     }
 
     public void swap(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
@@ -163,6 +174,37 @@ public class RenameFiles {
             StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
             //TODO check the answer of renameTo
             final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
+        }
+    }
+
+    private class FileInfos {
+        private final File f;
+        private String extension;
+        private String name;
+
+        public FileInfos(File f) {
+            this.f = f;
+        }
+
+        public String getExtension() {
+            return extension;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public FileInfos invoke() {
+            final String oldName = f.getName();
+            extension = VOID_STRING;
+            name = oldName;
+            final Integer dotPos = oldName.lastIndexOf(EXTENSION_SEPARATOR);
+
+            if (dotPos > 0) {
+                extension = oldName.substring(dotPos);
+                name = oldName.substring(0, dotPos);
+            }
+            return this;
         }
     }
 }
