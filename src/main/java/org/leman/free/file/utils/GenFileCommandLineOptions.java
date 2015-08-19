@@ -23,8 +23,8 @@ public class GenFileCommandLineOptions {
             required = false)
     private String findString;
 
-    @Option(name = "-rs", usage = "swap position of the strings that that are on each side of first position of the" +
-                                 " defined character", metaVar = "string",
+    @Option(name = "-rs", usage = "string defined by the user to replace the searched string in the file name",
+            metaVar = "string",
             aliases = "--replaceString",
             required = false)
     private String replaceString;
@@ -69,6 +69,14 @@ public class GenFileCommandLineOptions {
 
     public void setSwap(String swap) {
         this.swap = swap;
+    }
+
+    public void setFindString(String findString) {
+        this.findString = findString;
+    }
+
+    public void setReplaceString(String replaceString) {
+        this.replaceString = replaceString;
     }
 
     public void setZipFile(boolean zipFile) {

@@ -31,6 +31,7 @@ public class RenameFilesTest {
     public static final String SLASH_START = separator + "start";
     public static final String SLASH_DASH = separator + "dash";
     public static final String SLASH_SPACE = separator + "space";
+    public static final String SLASH_MINUS = separator + "minus";
 
     public static final String FILE_NOT_EXISTS = "test not exists.txt";
     public static final String FILE_NOT_EXISTS_WITH_UNDERSCORES = "test_not_exists.txt";
@@ -61,6 +62,20 @@ public class RenameFilesTest {
 
     public static final String FILE_NAME_TEST_UNDERSCORE = "test_underscore.txt";
     public static final String FILE_NAME_TEST_UNDERSCORE_UPPERCASE = "TEST_UNDERSCORE.TXT";
+
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN = "test space with minus.txt";
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN_END = "test-space-with-minus.txt";
+
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_DOUBLE_UNDERSCORE =
+                                                                        "test space with double underscore.txt";
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH__DOUBLE_UNDERSCORE_END =
+                                                                    "test__space__with__double__underscore.txt";
+
+
+    public static final String FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END = "test_minus with_underscore.txt";
+    public static final String FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END_TWO = "test_minus_" +
+                                                                                           "with_underscore" +
+                                                                                        ".txt";
 
     public static File currentDirectory;
 
@@ -316,4 +331,56 @@ public class RenameFilesTest {
         assertThat(new File(currentDirectory, FILE_NAME_TEST_UNDERSCORE_UPPERCASE).exists()).isTrue();
     }
 
+    @Test
+    public void when_fileName_contains_space_replace_with_minus_sign_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setFindString(" ");
+        genFileCommandLineOptions.setReplaceString("-");
+        genFileCommandLineOptions.setFileName(FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN);
+
+        //when
+        renameFiles.renaming(currentDirectory, genFileCommandLineOptions);
+
+        //then
+        assertThat(new File(currentDirectory, FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN_END).exists()).isTrue();
+    }
+
+    @Test
+    public void when_fileName_contains_space_replace_with_double_underscore_sign_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setFindString(" ");
+        genFileCommandLineOptions.setReplaceString("__");
+        genFileCommandLineOptions.setFileName(FILE_NAME_TEST_REPLACE_SPACE_WITH_DOUBLE_UNDERSCORE);
+
+        //when
+        renameFiles.renaming(currentDirectory, genFileCommandLineOptions);
+
+        //then
+        assertThat(new File(currentDirectory, FILE_NAME_TEST_REPLACE_SPACE_WITH__DOUBLE_UNDERSCORE_END).exists()).isTrue();
+    }
+
+    @Test
+    public void when_fileName_in_folder_with_spaces_to_be_renamed_with_minus_sign_ok() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setFindString("-");
+        genFileCommandLineOptions.setReplaceString("_");
+
+        final File workDirectory = new File(currentDirectory + SLASH_MINUS);
+
+        //when
+        renameFiles.renaming(workDirectory, genFileCommandLineOptions);
+
+        //then
+        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END).exists()).isTrue();
+        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END_TWO).exists()).isTrue();
+    }
 }

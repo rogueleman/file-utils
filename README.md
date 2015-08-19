@@ -19,7 +19,7 @@ swap filename for a given string, here " - " is default
 java -jar file-utils.jar -f "Titlu 2 - Nume autor2.mobi" -swap
 expected: file will be renamed to Nume autor2 - Titlu 2.mobi
 
-todo 4 -
+#4 - done
 user will choose the characters
 java -jar file-utils.jar -f "Titlu 2 - Nume autor2.mobi" -swap --findString " " --replaceString "-"
 expected: file will be renamed to "Titlu-2---Nume-autor2.mobi"
