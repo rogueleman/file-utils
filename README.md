@@ -29,7 +29,7 @@ java -jar file-utils.jar --file abc test.zip -zip -rt underscore
 expected: all files from zip file will be renamed with _ in place of spaces
 
 
-Categories that can not be used together. If used the first one is used
+Categories that can not be used together. If so the first one is used
 I    lowercase, uppercase
 II   underscore, space
 III  swap with any other

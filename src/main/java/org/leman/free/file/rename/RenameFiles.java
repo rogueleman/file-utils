@@ -22,29 +22,13 @@ public class RenameFiles {
     public void renaming(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
 
         final String fileName = commandLineArguments.getFileName();
-        if (isNotBlank(commandLineArguments.getRenamingType())) {
-            final List<RenamingType> renamingTypes = getRenamingTypesConstants(commandLineArguments.getRenamingType());
-
-            if (isNotBlank(fileName)) {
-                final File file = new File(currentDirectory + separator + fileName);
-                renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
-            } else {
-                final File[] files = currentDirectory.listFiles();
-                for (final File file : files) {
-                    renameFile(file, file.getParent(), getNewFileName(file, renamingTypes));
-                }
-            }
+        if (isNotBlank(fileName)) {
+            final File file = new File(currentDirectory + separator + fileName);
+            renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments));
         } else {
-            if (isNotBlank(fileName)) {
-                final File file = new File(currentDirectory + separator + fileName);
-                renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments.getFindString(),
-                                                                  commandLineArguments.getReplaceString()));
-            } else {
-                final File[] files = currentDirectory.listFiles();
-                for (final File file : files) {
-                    renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments.getFindString(),
-                                                                      commandLineArguments.getReplaceString()));
-                }
+            final File[] files = currentDirectory.listFiles();
+            for (final File file : files) {
+                renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments));
             }
         }
     }
@@ -73,19 +57,28 @@ public class RenameFiles {
      */
     protected void renameFile(final File f, final String parent, final String newFileName) {
         if (!f.isDirectory() && !f.getName().equals("file-utils.jar")) {
-            StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
+            final StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
             //TODO check the answer of renameTo
             final boolean b = f.renameTo(new File(pathWithSlash + newFileName));
         }
     }
 
     /**
-     * @param f             - file to rename
-     * @param renamingTypes - values for type of renaming
+     * @param file                 - file to rename
+     * @param commandLineArguments - command line arguments
      * @return - the new name of the file
      */
+    private String getNewFileName(final File file, final GenFileCommandLineOptions commandLineArguments) {
+        final String renamingType = commandLineArguments.getRenamingType();
+        if (isNotBlank(renamingType)) {
+            return getNewFileName(file, getRenamingTypesConstants(renamingType));
+        } else {
+            return getNewFileName(file, commandLineArguments.getFindString(), commandLineArguments.getReplaceString());
+        }
+    }
+
     protected String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
-        final FileInfos fileInfos = new FileInfos(f).invoke();
+        final FileInfos fileInfos = new FileInfos(f).getFileInfo();
         final String name = fileInfos.getName();
         final String extension = fileInfos.getExtension();
 
@@ -116,9 +109,9 @@ public class RenameFiles {
     }
 
     private String getNewFileName(final File file, final String findString, final String replaceString) {
-        final FileInfos fileInfos = new FileInfos(file).invoke();
+        final FileInfos fileInfos = new FileInfos(file).getFileInfo();
         final String name = fileInfos.getName();
-        String extension = fileInfos.getExtension();
+        final String extension = fileInfos.getExtension();
 
         StringBuffer newName = new StringBuffer(VOID_STRING);
 
@@ -168,7 +161,7 @@ public class RenameFiles {
         return renamingTypes;
     }
 
-    private String[] getFileExtension(String fileName) {
+    private String[] getFileExtension(final String fileName) {
         String extension = VOID_STRING;
         String name = fileName;
         final Integer dotPos = fileName.lastIndexOf(EXTENSION_SEPARATOR);
@@ -191,7 +184,7 @@ public class RenameFiles {
                             final String extension) {
         if (nameSplits.length == 2) {
             if (!file.isDirectory() && !file.getName().equals("file-utils.jar")) {
-                StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
+                final StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
                 //TODO check the answer of renameTo
                 final String pathName = pathWithSlash + nameSplits[1] + swap + nameSplits[0] + extension;
                 final boolean b = file.renameTo(new File(pathName));
@@ -218,7 +211,7 @@ public class RenameFiles {
             return name;
         }
 
-        public FileInfos invoke() {
+        public FileInfos getFileInfo() {
             final String oldName = f.getName();
             extension = VOID_STRING;
             name = oldName;
