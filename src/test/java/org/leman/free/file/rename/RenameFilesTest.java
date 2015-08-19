@@ -1,6 +1,5 @@
 package org.leman.free.file.rename;
 
-import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.io.FileUtils.copyDirectory;
@@ -24,14 +23,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RenameFilesTest {
-
     public static final String USER_DIR = "user.dir";
 
-    public static final String SLASH_END = separator + "end";
-    public static final String SLASH_START = separator + "start";
-    public static final String SLASH_DASH = separator + "dash";
-    public static final String SLASH_SPACE = separator + "space";
-    public static final String SLASH_MINUS = separator + "minus";
+    public static final String END = "end";
+    public static final String START = "start";
+    public static final String SWAP = "swap";
+    public static final String SPACE = "space";
+    public static final String DASH = "dash";
 
     public static final String FILE_NOT_EXISTS = "test not exists.txt";
     public static final String FILE_NOT_EXISTS_WITH_UNDERSCORES = "test_not_exists.txt";
@@ -63,19 +61,17 @@ public class RenameFilesTest {
     public static final String FILE_NAME_TEST_UNDERSCORE = "test_underscore.txt";
     public static final String FILE_NAME_TEST_UNDERSCORE_UPPERCASE = "TEST_UNDERSCORE.TXT";
 
-    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN = "test space with minus.txt";
-    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN_END = "test-space-with-minus.txt";
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_DASH_SIGN = "test space with dash.txt";
+    public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_DASH_SIGN_END = "test-space-with-dash.txt";
 
     public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH_DOUBLE_UNDERSCORE =
                                                                         "test space with double underscore.txt";
     public static final String FILE_NAME_TEST_REPLACE_SPACE_WITH__DOUBLE_UNDERSCORE_END =
                                                                     "test__space__with__double__underscore.txt";
 
-
-    public static final String FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END = "test_minus with_underscore.txt";
-    public static final String FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END_TWO = "test_minus_" +
-                                                                                           "with_underscore" +
-                                                                                        ".txt";
+    public static final String FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END = "test_dash with_underscore.txt";
+    public static final String FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END_TWO =
+                                                                    "test_dash_with_underscore.txt";
 
     public static File currentDirectory;
 
@@ -85,6 +81,8 @@ public class RenameFilesTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         //get the folder resource by other method, not using Spring method ClassPathResource
+        // can use this
+        // URL resource = FlatUploadMappingFileTest.class.getResource("/");
         URL resource = RenameFilesTest.class.getResource("/file-utils");
         final File file = Paths.get(resource.toURI()).toFile();
 
@@ -94,8 +92,8 @@ public class RenameFilesTest {
         currentDirectory = new File(getProperty(USER_DIR));
 
         // copy all files from start directory to end directory
-        final File source = new File(currentDirectory + SLASH_START);
-        final File destination = new File(currentDirectory + SLASH_END);
+        final File source = new File(currentDirectory, START);
+        final File destination = new File(currentDirectory, END);
         copyDirectory(source, destination);
 
         currentDirectory = destination;
@@ -114,7 +112,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITH_SPACES);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_WITH_SPACES);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -132,7 +130,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NOT_EXISTS);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NOT_EXISTS);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -149,7 +147,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(UPPERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITH_SPACES_1);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_WITH_SPACES_1);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -166,7 +164,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(UPPERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITHOUT_EXTENSION);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_WITHOUT_EXTENSION);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -184,7 +182,7 @@ public class RenameFilesTest {
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants
                 (REPLACE_SPACES_WITH_UNDERSCORES.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_WITHOUT_SPACES);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_WITHOUT_SPACES);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -201,7 +199,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants(LOWERCASE_ALL.getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_UPPERCASE);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_UPPERCASE);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -221,7 +219,7 @@ public class RenameFilesTest {
                                                                                        + REPLACE_SPACES_WITH_UNDERSCORES
                 .getValue());
 
-        final File fileToBeRenamed = new File(currentDirectory + separator + FILE_NAME_TWO_CONVERSIONS);
+        final File fileToBeRenamed = new File(currentDirectory, FILE_NAME_TWO_CONVERSIONS);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -238,7 +236,7 @@ public class RenameFilesTest {
         final RenameFiles renameFiles = new RenameFiles();
         final List<RenamingType> renamingTypes = renameFiles.getRenamingTypesConstants("wrongRenamingType");
 
-        final File fileToBeRenamed = new File(currentDirectory + SLASH_END + separator + FILE_NAME_WITHOUT_SPACES);
+        final File fileToBeRenamed = new File(currentDirectory, END + FILE_NAME_WITHOUT_SPACES);
 
         //when
         renameFiles.renameFile(fileToBeRenamed,
@@ -288,7 +286,7 @@ public class RenameFilesTest {
         final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
         genFileCommandLineOptions.setSwap(" - ");
 
-        final File workDirectory = new File(currentDirectory + SLASH_DASH);
+        final File workDirectory = new File(currentDirectory, SWAP);
         //when
         renameFiles.swap(workDirectory, genFileCommandLineOptions);
 
@@ -305,7 +303,7 @@ public class RenameFilesTest {
         final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
         genFileCommandLineOptions.setRenamingType(UPPERCASE_ALL.getValue());
 
-        final File workDirectory = new File(currentDirectory + SLASH_SPACE);
+        final File workDirectory = new File(currentDirectory, SPACE);
 
         //when
         renameFiles.renaming(workDirectory, genFileCommandLineOptions);
@@ -339,13 +337,13 @@ public class RenameFilesTest {
         final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
         genFileCommandLineOptions.setFindString(" ");
         genFileCommandLineOptions.setReplaceString("-");
-        genFileCommandLineOptions.setFileName(FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN);
+        genFileCommandLineOptions.setFileName(FILE_NAME_TEST_REPLACE_SPACE_WITH_DASH_SIGN);
 
         //when
         renameFiles.renaming(currentDirectory, genFileCommandLineOptions);
 
         //then
-        assertThat(new File(currentDirectory, FILE_NAME_TEST_REPLACE_SPACE_WITH_MINUS_SIGN_END).exists()).isTrue();
+        assertThat(new File(currentDirectory, FILE_NAME_TEST_REPLACE_SPACE_WITH_DASH_SIGN_END).exists()).isTrue();
     }
 
     @Test
@@ -366,7 +364,7 @@ public class RenameFilesTest {
     }
 
     @Test
-    public void when_fileName_in_folder_with_spaces_to_be_renamed_with_minus_sign_ok() throws Exception {
+    public void when_fileName_in_folder_with_spaces_to_be_renamed_with_dash_sign_ok() throws Exception {
         //given
         final RenameFiles renameFiles = new RenameFiles();
 
@@ -374,13 +372,13 @@ public class RenameFilesTest {
         genFileCommandLineOptions.setFindString("-");
         genFileCommandLineOptions.setReplaceString("_");
 
-        final File workDirectory = new File(currentDirectory + SLASH_MINUS);
+        final File workDirectory = new File(currentDirectory, DASH);
 
         //when
         renameFiles.renaming(workDirectory, genFileCommandLineOptions);
 
         //then
-        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END).exists()).isTrue();
-        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_MINUS_SIGN_WITH_UNDERSCORE_END_TWO).exists()).isTrue();
+        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END).exists()).isTrue();
+        assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END_TWO).exists()).isTrue();
     }
 }
