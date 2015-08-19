@@ -32,12 +32,26 @@ public class RenameFiles {
     public static final String UNDERSCORE = "_";
     public static final String VOID_STRING = "";
 
-    public void renaming(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
+    public void renaming(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments)
+            throws IOException {
 
         final String fileName = commandLineArguments.getFileName();
         if (isNotBlank(fileName)) {
-            final File file = new File(currentDirectory + separator + fileName);
-            renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments));
+            if (commandLineArguments.isZipFile()) {
+                final ZipFileInfos zipFileInfos = new ZipFileInfos(currentDirectory, fileName).getZipFileInfo();
+                final Enumeration<? extends ZipEntry> entries = zipFileInfos.getEntries();
+
+                while (entries.hasMoreElements()) {
+                    final String inZipFileName = entries.nextElement().getName();
+                    renameFileInZip(zipFileInfos.getZipFilePath(),
+                                    inZipFileName,
+                                    getNewFileName(inZipFileName, commandLineArguments));
+                }
+                zipFileInfos.getZipFile().close();
+            } else {
+                final File file = new File(currentDirectory + separator + fileName);
+                renameFile(file, file.getParent(), getNewFileName(file, commandLineArguments));
+            }
         } else {
             final File[] files = currentDirectory.listFiles();
             for (final File file : files) {
@@ -58,22 +72,22 @@ public class RenameFiles {
 
                 while (entries.hasMoreElements()) {
                     final String inZipFileName = entries.nextElement().getName();
-                    final String[] nameSplits = getFileExtension(inZipFileName)[0].split(swap, 2);
+                    final String[] nameSplits = getFileNameAndExtension(inZipFileName)[0].split(swap, 2);
                     renameFileInZip(zipFileInfos.getZipFilePath(),
                                     inZipFileName,
-                                    getNewFileName(nameSplits, swap, getFileExtension(inZipFileName)[1]));
+                                    getNewFileName(nameSplits, swap, getFileNameAndExtension(inZipFileName)[1]));
                 }
                 zipFileInfos.getZipFile().close();
             } else {
-                final String[] nameSplits = getFileExtension(fileName)[0].split(swap, 2);
+                final String[] nameSplits = getFileNameAndExtension(fileName)[0].split(swap, 2);
                 final File file = new File(currentDirectory + separator + fileName);
-                renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(fileName)[1]);
+                renameFileForSwap(file, file.getParent(), nameSplits, swap, getFileNameAndExtension(fileName)[1]);
             }
         } else {
             final File[] files = currentDirectory.listFiles();
             for (final File file : files) {
-                final String[] nameSplits = getFileExtension(file.getName())[0].split(swap, 2);
-                renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(file.getName())[1]);
+                final String[] nameSplits = getFileNameAndExtension(file.getName())[0].split(swap, 2);
+                renameFileForSwap(file, file.getParent(), nameSplits, swap, getFileNameAndExtension(file.getName())[1]);
             }
         }
     }
@@ -105,11 +119,50 @@ public class RenameFiles {
         }
     }
 
+    private String getNewFileName(final String fileName, final GenFileCommandLineOptions commandLineArguments) {
+        final String renamingType = commandLineArguments.getRenamingType();
+        if (isNotBlank(renamingType)) {
+            return getNewFileName(fileName, getRenamingTypesConstants(renamingType));
+        } else {
+            return getNewFileName(fileName, commandLineArguments.getFindString(), commandLineArguments.getReplaceString());
+        }
+    }
+
     protected String getNewFileName(final File f, final List<RenamingType> renamingTypes) {
         final FileInfos fileInfos = new FileInfos(f).getFileInfo();
         final String name = fileInfos.getName();
         final String extension = fileInfos.getExtension();
 
+        StringBuffer newName = new StringBuffer(name);
+
+        if (renamingTypes.contains(REPLACE_SPACES_WITH_UNDERSCORES)) {
+            final String[] nameSplit = name.split(REGEX_TO_FIND_SPACES);
+
+            newName = new StringBuffer(VOID_STRING);
+
+            if (nameSplit.length > 1) {
+                for (int j = 0; j < nameSplit.length; j++) {
+                    if (!nameSplit[j].toString().equals(VOID_STRING)) {
+                        newName = newName.append(nameSplit[j]);
+                        if (j != nameSplit.length - 1) {
+                            newName = newName.append(UNDERSCORE);
+                        }
+                    }
+                }
+                newName = newName.append(extension);
+            } else {
+                newName = newName.append(name).append(extension);
+            }
+        } else {
+            newName = newName.append(extension);
+        }
+        return checkTypeOfLettersCase(newName.toString(), renamingTypes);
+    }
+
+    private String getNewFileName(final String fileName, final List<RenamingType> renamingTypes) {
+        final String[] fileNameAndExtension = getFileNameAndExtension(fileName);
+        final String name = fileNameAndExtension[0];
+        final String extension = fileNameAndExtension[1];
         StringBuffer newName = new StringBuffer(name);
 
         if (renamingTypes.contains(REPLACE_SPACES_WITH_UNDERSCORES)) {
@@ -161,6 +214,31 @@ public class RenameFiles {
         return newName.toString();
     }
 
+    private String getNewFileName(final String fileName, final String findString, final String replaceString) {
+        final String[] fileNameAndExtension = getFileNameAndExtension(fileName);
+        final String name = fileNameAndExtension[0];
+        final String extension = fileNameAndExtension[1];
+
+        StringBuffer newName = new StringBuffer(VOID_STRING);
+
+        final String[] nameSplit = name.split(findString);
+
+        if (nameSplit.length > 1) {
+            for (int j = 0; j < nameSplit.length; j++) {
+                if (!nameSplit[j].toString().equals(VOID_STRING)) {
+                    newName = newName.append(nameSplit[j]);
+                    if (j != nameSplit.length - 1) {
+                        newName = newName.append(replaceString);
+                    }
+                }
+            }
+            newName = newName.append(extension);
+        } else {
+            newName = newName.append(name).append(extension);
+        }
+        return newName.toString();
+    }
+
     private String checkTypeOfLettersCase(final String fileName, final List<RenamingType> renamingTypes) {
         if (renamingTypes.contains(LOWERCASE_ALL)) {
             return fileName.toLowerCase();
@@ -189,7 +267,7 @@ public class RenameFiles {
         return renamingTypes;
     }
 
-    private String[] getFileExtension(final String fileName) {
+    private String[] getFileNameAndExtension(final String fileName) {
         String extension = VOID_STRING;
         String name = fileName;
         final Integer dotPos = fileName.lastIndexOf(EXTENSION_SEPARATOR);
@@ -208,8 +286,8 @@ public class RenameFiles {
      * @param parent     - path to file to rename
      * @param nameSplits - the splits Array
      */
-    private void renameFile(final File file, final String parent, final String[] nameSplits, final String swap,
-                            final String extension) {
+    private void renameFileForSwap(final File file, final String parent, final String[] nameSplits, final String swap,
+                                   final String extension) {
         if (nameSplits.length == 2) {
             if (!file.isDirectory() && !file.getName().equals("file-utils.jar")) {
                 final StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
