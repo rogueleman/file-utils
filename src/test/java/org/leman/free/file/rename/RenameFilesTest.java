@@ -11,7 +11,11 @@ import static org.leman.free.file.utils.RenamingType.UPPERCASE_ALL;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -30,6 +34,7 @@ public class RenameFilesTest {
     public static final String SWAP = "swap";
     public static final String SPACE = "space";
     public static final String DASH = "dash";
+    public static final String ZIP = "zip";
 
     public static final String FILE_NOT_EXISTS = "test not exists.txt";
     public static final String FILE_NOT_EXISTS_WITH_UNDERSCORES = "test_not_exists.txt";
@@ -72,6 +77,8 @@ public class RenameFilesTest {
     public static final String FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END = "test_dash with_underscore.txt";
     public static final String FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END_TWO =
                                                                     "test_dash_with_underscore.txt";
+
+    public static final String FILE_NAME_SWAP_ZIP = "swap.zip";
 
     public static File currentDirectory;
 
@@ -380,5 +387,39 @@ public class RenameFilesTest {
         //then
         assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END).exists()).isTrue();
         assertThat(new File(workDirectory, FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END_TWO).exists()).isTrue();
+    }
+
+    @Test
+    public void when_fileName_contains_dash_swap_sides_in_zip_file() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setSwap(" - ");
+        genFileCommandLineOptions.setFileName(FILE_NAME_SWAP_ZIP);
+        genFileCommandLineOptions.setZipFile(true);
+
+        final File workDirectory = new File(currentDirectory, ZIP);
+
+        //when
+        renameFiles.swap(workDirectory, genFileCommandLineOptions);
+
+        //then
+        final File zipFilePath = new File(workDirectory, genFileCommandLineOptions.getFileName());
+        final ZipFile zipFile = new ZipFile(zipFilePath, ZipFile.OPEN_READ);
+        final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+        final List<String> fileNamesInZipFile = new ArrayList<>();
+        fileNamesInZipFile.add(FILE_NAME_AUTOR1_DASH_TITLU1);
+        fileNamesInZipFile.add(FILE_NAME_AUTOR2_DASH_TITLU2);
+
+        Integer i = 0;
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            String inZipFileName = entry.getName();
+            assertThat(inZipFileName).isEqualToIgnoringCase(fileNamesInZipFile.get(i));
+            i++;
+        }
+
     }
 }

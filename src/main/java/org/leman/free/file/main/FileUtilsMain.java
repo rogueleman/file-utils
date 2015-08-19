@@ -4,6 +4,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -18,7 +19,7 @@ public class FileUtilsMain {
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         final GenFileCommandLineOptions commandLineArguments = getCommandLineArguments(args);
         final RenameFiles renameFiles = new RenameFiles();
 

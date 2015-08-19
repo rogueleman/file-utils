@@ -1,14 +1,27 @@
 package org.leman.free.file.rename;
 
 import static java.io.File.separator;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.util.zip.ZipFile.OPEN_READ;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.leman.free.file.utils.RenamingType.LOWERCASE_ALL;
 import static org.leman.free.file.utils.RenamingType.REPLACE_SPACES_WITH_UNDERSCORES;
 import static org.leman.free.file.utils.RenamingType.UPPERCASE_ALL;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.leman.free.file.utils.GenFileCommandLineOptions;
 import org.leman.free.file.utils.RenamingType;
@@ -33,14 +46,29 @@ public class RenameFiles {
         }
     }
 
-    public void swap(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments) {
+    public void swap(final File currentDirectory, final GenFileCommandLineOptions commandLineArguments)
+            throws IOException {
         final String swap = commandLineArguments.getSwap();
         final String fileName = commandLineArguments.getFileName();
 
         if (isNotBlank(fileName)) {
-            final String[] nameSplits = getFileExtension(fileName)[0].split(swap, 2);
-            final File file = new File(currentDirectory + separator + fileName);
-            renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(fileName)[1]);
+            if (commandLineArguments.isZipFile()) {
+                final ZipFileInfos zipFileInfos = new ZipFileInfos(currentDirectory, fileName).getZipFileInfo();
+                final Enumeration<? extends ZipEntry> entries = zipFileInfos.getEntries();
+
+                while (entries.hasMoreElements()) {
+                    final String inZipFileName = entries.nextElement().getName();
+                    final String[] nameSplits = getFileExtension(inZipFileName)[0].split(swap, 2);
+                    renameFileInZip(zipFileInfos.getZipFilePath(),
+                                    inZipFileName,
+                                    getNewFileName(nameSplits, swap, getFileExtension(inZipFileName)[1]));
+                }
+                zipFileInfos.getZipFile().close();
+            } else {
+                final String[] nameSplits = getFileExtension(fileName)[0].split(swap, 2);
+                final File file = new File(currentDirectory + separator + fileName);
+                renameFile(file, file.getParent(), nameSplits, swap, getFileExtension(fileName)[1]);
+            }
         } else {
             final File[] files = currentDirectory.listFiles();
             for (final File file : files) {
@@ -186,12 +214,39 @@ public class RenameFiles {
             if (!file.isDirectory() && !file.getName().equals("file-utils.jar")) {
                 final StringBuffer pathWithSlash = new StringBuffer(parent).insert(parent.length(), separator);
                 //TODO check the answer of renameTo
-                final String pathName = pathWithSlash + nameSplits[1] + swap + nameSplits[0] + extension;
+                final String pathName = pathWithSlash + getNewFileName(nameSplits, swap, extension);
                 final boolean b = file.renameTo(new File(pathName));
             }
         } else {
             System.out.println("File \"" + file.getName() + "\" does not contains the swap character");
         }
+    }
+
+    private String getNewFileName(String[] nameSplits, String swap, String extension) {
+        return nameSplits[1] + swap + nameSplits[0] + extension;
+    }
+
+    private void renameFileInZip(final File zipFilePath, final String fileNameToRename,
+                                 final String newFileName) throws IOException {
+        /* Define ZIP File System Properies in HashMap */
+        Map<String, String> zip_properties = new HashMap<>();
+        /* We want to read an existing ZIP File, so we set this to False */
+        zip_properties.put("create", "false");
+
+        /* Specify the path to the ZIP File that you want to read as a File System */
+        URI zip_disk = URI.create("jar:file:///" + zipFilePath);
+
+        /* Create ZIP file System */
+        try (FileSystem zipfs = FileSystems.newFileSystem(zip_disk, zip_properties)) {
+            /* Access file that needs to be renamed */
+            Path pathInZipfile = zipfs.getPath(fileNameToRename);
+            /* Specify new file name */
+            Path renamedZipEntry = zipfs.getPath(newFileName);
+            /* Execute rename */
+            Files.move(pathInZipfile, renamedZipEntry, ATOMIC_MOVE);
+            //System.out.println(pathInZipfile + "File successfully renamed to " + renamedZipEntry);
+        }
+
     }
 
     private class FileInfos {
@@ -221,6 +276,38 @@ public class RenameFiles {
                 extension = oldName.substring(dotPos);
                 name = oldName.substring(0, dotPos);
             }
+            return this;
+        }
+    }
+
+    private class ZipFileInfos {
+        private File currentDirectory;
+        private String fileName;
+        private File zipFilePath;
+        private ZipFile zipFile;
+        private Enumeration<? extends ZipEntry> entries;
+
+        public ZipFileInfos(File currentDirectory, String fileName) {
+            this.currentDirectory = currentDirectory;
+            this.fileName = fileName;
+        }
+
+        public File getZipFilePath() {
+            return zipFilePath;
+        }
+
+        public ZipFile getZipFile() {
+            return zipFile;
+        }
+
+        public Enumeration<? extends ZipEntry> getEntries() {
+            return entries;
+        }
+
+        public ZipFileInfos getZipFileInfo() throws IOException {
+            zipFilePath = new File(currentDirectory, fileName);
+            zipFile = new ZipFile(zipFilePath, OPEN_READ);
+            entries = zipFile.entries();
             return this;
         }
     }
