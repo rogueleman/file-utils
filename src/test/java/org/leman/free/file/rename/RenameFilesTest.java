@@ -44,9 +44,11 @@ public class RenameFilesTest {
 
     public static final String FILE_NAME_WITH_SPACES_1 = "test with spaces 1.txt";
     public static final String FILE_NAME_WITH_SPACES_1_UPPERCASE = "TEST WITH SPACES 1.TXT";
+    public static final String FILE_NAME_WITH_SPACES_1_UPPERCASE_UNDERSCORE = "TEST_WITH_SPACES_1.TXT";
 
     public static final String FILE_NAME_WITHOUT_EXTENSION = "test without extension";
     public static final String FILE_NAME_WITHOUT_EXTENSION_UPPERCASE = "TEST WITHOUT EXTENSION";
+    public static final String FILE_NAME_WITHOUT_EXTENSION_UPPERCASE_UNDERSCORE = "TEST_WITHOUT_EXTENSION";
 
     public static final String FILE_NAME_WITHOUT_SPACES = "WithoutSpaces.txt";
 
@@ -79,6 +81,8 @@ public class RenameFilesTest {
                                                                     "test_dash_with_underscore.txt";
 
     public static final String FILE_NAME_SWAP_ZIP = "swap.zip";
+    public static final String FILE_NAME_DASH_ZIP = "dash.zip";
+    public static final String FILE_NAME_SPACE_ZIP = "space.zip";
 
     public static File currentDirectory;
 
@@ -420,6 +424,75 @@ public class RenameFilesTest {
             assertThat(inZipFileName).isEqualToIgnoringCase(fileNamesInZipFile.get(i));
             i++;
         }
+    }
 
+    @Test
+    public void when_fileName_contains_dash_rename_in_zip_file() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setFindString("-");
+        genFileCommandLineOptions.setReplaceString("_");
+        genFileCommandLineOptions.setFileName(FILE_NAME_DASH_ZIP);
+        genFileCommandLineOptions.setZipFile(true);
+
+        final File workDirectory = new File(currentDirectory, ZIP);
+
+        //when
+        renameFiles.renaming(workDirectory, genFileCommandLineOptions);
+
+        //then
+        final File zipFilePath = new File(workDirectory, genFileCommandLineOptions.getFileName());
+        final ZipFile zipFile = new ZipFile(zipFilePath, ZipFile.OPEN_READ);
+        final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+        final List<String> fileNamesInZipFile = new ArrayList<>();
+        fileNamesInZipFile.add("test.txt");
+        fileNamesInZipFile.add(FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END);
+        fileNamesInZipFile.add(FILE_NAME_TEST_REPLACE_DASH_SIGN_WITH_UNDERSCORE_END_TWO);
+
+        Integer i = 0;
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            String inZipFileName = entry.getName();
+            assertThat(inZipFileName).isEqualToIgnoringCase(fileNamesInZipFile.get(i));
+            i++;
+        }
+    }
+
+    @Test
+    public void when_fileName_contains_space_rename_in_zip_file() throws Exception {
+        //given
+        final RenameFiles renameFiles = new RenameFiles();
+
+        final GenFileCommandLineOptions genFileCommandLineOptions = new GenFileCommandLineOptions();
+        genFileCommandLineOptions.setRenamingType(UPPERCASE_ALL.getValue()
+                                                  + " "
+                                                  + REPLACE_SPACES_WITH_UNDERSCORES.getValue());
+        genFileCommandLineOptions.setFileName(FILE_NAME_SPACE_ZIP);
+        genFileCommandLineOptions.setZipFile(true);
+
+        final File workDirectory = new File(currentDirectory, ZIP);
+
+        //when
+        renameFiles.renaming(workDirectory, genFileCommandLineOptions);
+
+        //then
+        final File zipFilePath = new File(workDirectory, genFileCommandLineOptions.getFileName());
+        final ZipFile zipFile = new ZipFile(zipFilePath, ZipFile.OPEN_READ);
+        final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+        final List<String> fileNamesInZipFile = new ArrayList<>();
+        fileNamesInZipFile.add(FILE_NAME_WITHOUT_EXTENSION_UPPERCASE_UNDERSCORE);
+        fileNamesInZipFile.add(FILE_NAME_WITH_SPACES_1_UPPERCASE_UNDERSCORE);
+
+        Integer i = 0;
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            String inZipFileName = entry.getName();
+            assertThat(inZipFileName).isEqualToIgnoringCase(fileNamesInZipFile.get(i));
+            i++;
+        }
     }
 }
